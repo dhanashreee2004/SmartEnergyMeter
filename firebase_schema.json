@@ -1,0 +1,101 @@
+{
+    "consumers": {
+        "consumer_001": {
+            "name": "Rahul Sharma",
+            "consumer_category": "household",
+            "meter_id": "meter_101",
+            "connected_load": 5,
+            "solar_connection": false,
+            "installation_date": "2024-01-10",
+            "current_balance": 350,
+            "credit_score": 120,
+            "status": "active"
+        }
+    },
+    "meters": {
+        "meter_101": {
+            "readings": {
+                "17100001": {
+                    "voltage": 231,
+                    "current": 3.5,
+                    "frequency": 49.9,
+                    "power": 805,
+                    "power_factor": 0.96,
+                    "energy_increment": 0.002,
+                    "outage_flag": 0
+                }
+            }
+        }
+    },
+    "tariff_rules": {
+        "household_tariffs": {
+            "slab1_limit": 100,
+            "slab1_rate": 4,
+            "slab2_limit": 300,
+            "slab2_rate": 6,
+            "slab3_rate": 8
+        },
+        "msme_tariffs": {
+            "slab1_limit": 1000,
+            "slab1_rate": 7,
+            "slab2_limit": 5000,
+            "slab2_rate": 8,
+            "slab3_limit": 10000,
+            "slab3_rate": 9,
+            "slab4_rate": 10
+        },
+        "power_factor_rules": {
+            "pf_warning": 0.95,
+            "pf_penalty_1": 0.90,
+            "pf_penalty_2": 0.85
+        }
+    },
+    "recharge_history": {
+        "recharge_001": {
+            "consumer_id": "consumer_001",
+            "timestamp": 17100020,
+            "amount": 500,
+            "payment_method": "UPI",
+            "balance_after_recharge": 850
+        }
+    },
+    "billing_records": {
+        "bill_001": {
+            "consumer_id": "consumer_001",
+            "timestamp": 17100030,
+            "units_consumed": 120,
+            "energy_charge": 620,
+            "pf_penalty": 12,
+            "demand_penalty": 0,
+            "utility_compensation": 5,
+            "final_bill": 627
+        }
+    },
+    "notifications": {
+        "notif_001": {
+            "consumer_id": "consumer_001",
+            "timestamp": 17100040,
+            "notification_type": "low_balance",
+            "message": "Your prepaid balance is below 20%",
+            "status": "unread"
+        }
+    },
+    "event_logs": {
+        "event_001": {
+            "timestamp": 17100050,
+            "consumer_id": "consumer_001",
+            "event_type": "pf_warning",
+            "description": "Power factor dropped below 0.90"
+        }
+    },
+    "utility_statistics": {
+        "overview": {
+            "total_consumers": 245,
+            "total_energy_supplied": 124000,
+            "total_revenue": 895000,
+            "average_power_factor": 0.94,
+            "voltage_quality_index": 0.97,
+            "frequency_quality_index": 0.98
+        }
+    }
+}

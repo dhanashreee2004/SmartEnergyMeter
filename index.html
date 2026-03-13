@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Energy Dashboard</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="dashboard-wrapper">
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-bolt"></i>
+                <h2>EnergyDash</h2>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="active" data-target="tab-live-monitor"><i class="fa-solid fa-chart-line"></i> Live
+                    Monitor</a>
+                <a href="#" data-target="tab-analytics"><i class="fa-solid fa-chart-pie"></i> Analytics</a>
+                <a href="#" data-target="tab-power-quality"><i class="fa-solid fa-wave-square"></i> Power Quality</a>
+                <a href="#" data-target="tab-consumers"><i class="fa-solid fa-users"></i> Consumers</a>
+                <a href="#" data-target="tab-supplier-analytics"><i class="fa-solid fa-chart-bar"></i> Supplier
+                    Analytics</a>
+                <a href="#" data-target="tab-event-log"><i class="fa-solid fa-clipboard-list"></i> Event Log</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p id="page-subtitle">Real-time system monitoring</p>
+                </div>
+                <div class="header-actions" style="position: relative;">
+                    <button id="noti-btn"
+                        style="background: var(--card-bg); border: 1px solid var(--glass-border); padding: 0.75rem 1rem; border-radius: 99px; color: var(--text-main); cursor: pointer; transition: 0.3s;">
+                        <i class="fa-solid fa-bell"></i> <span id="noti-badge"
+                            style="background: var(--accent-power); color: #FFFFFF; border-radius: 50%; padding: 0.1rem 0.4rem; font-size: 0.75rem; vertical-align: top; margin-left: 0.25rem;">0</span>
+                    </button>
+                    <div id="noti-dropdown" class="glass"
+                        style="display: none; position: absolute; right: 0; top: 3.5rem; width: 320px; max-height: 400px; overflow-y: auto; z-index: 100;">
+                        <div style="padding: 1rem; border-bottom: 1px solid var(--glass-border); font-weight: 600;">
+                            Notifications</div>
+                        <div id="noti-list"
+                            style="padding: 0.5rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div
+                                style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                                No notifications</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div id="tab-live-monitor" class="tab-content active">
+                <section class="live-cards">
+                    <div class="card glass">
+                        <div class="card-icon voltage"><i class="fa-solid fa-plug-circle-bolt"></i></div>
+                        <div class="card-data">
+                            <h3>Voltage</h3>
+                            <p id="live-voltage">230.5 <span>V</span></p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon current"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="card-data">
+                            <h3>Current</h3>
+                            <p id="live-current">5.2 <span>A</span></p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon frequency"><i class="fa-solid fa-wave-square"></i></div>
+                        <div class="card-data">
+                            <h3>Frequency</h3>
+                            <p id="live-frequency">50.1 <span>Hz</span></p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon pf"><i class="fa-solid fa-circle-half-stroke"></i></div>
+                        <div class="card-data">
+                            <h3>Power Factor</h3>
+                            <p id="live-pf">0.98</p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon power"><i class="fa-solid fa-arrow-trend-up"></i></div>
+                        <div class="card-data">
+                            <h3>Power</h3>
+                            <p id="live-power">1172 <span>W</span></p>
+                        </div>
+                    </div>
+                    <div class="card glass">
+                        <div class="card-icon energy"><i class="fa-solid fa-leaf"></i></div>
+                        <div class="card-data">
+                            <h3>Energy Consumed</h3>
+                            <p id="live-energy">124.5 <span>kWh</span></p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="placeholders">
+                    <div class="charts-container">
+                        <div class="charts-grid">
+                            <div class="chart-card glass">
+                                <h3>Voltage vs Time</h3>
+                                <canvas id="voltageChart"></canvas>
+                            </div>
+                            <div class="chart-card glass">
+                                <h3>Power vs Time</h3>
+                                <canvas id="powerChart"></canvas>
+                            </div>
+                            <div class="chart-card glass">
+                                <h3>Current vs Time</h3>
+                                <canvas id="currentChart"></canvas>
+                            </div>
+                            <div class="chart-card glass">
+                                <h3>Frequency vs Time</h3>
+                                <canvas id="frequencyChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+            </div> <!-- End tab-live-monitor -->
+
+            <div id="tab-analytics" class="tab-content" style="display: none;">
+                <div class="analytics-panel glass">
+                    <div class="panel-header"
+                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-chart-pie" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">Energy Analytics</h2>
+                    </div>
+                    <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Peak Load</h4>
+                            <p id="calc-peak-load"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-power);">0
+                                <span>W</span>
+                            </p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Average Load</h4>
+                            <p id="calc-avg-load"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-voltage);">0
+                                <span>W</span>
+                            </p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Total Energy</h4>
+                            <p id="calc-total-energy"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-energy);">0.00
+                                <span>kWh</span>
+                            </p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Est. Cost (₹6/kWh)</h4>
+                            <p id="calc-est-cost" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₹
+                                0.00</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Hourly Energy</h4>
+                            <p id="calc-hourly-energy"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-freq);">0.00
+                                <span>kWh</span>
+                            </p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Daily Energy</h4>
+                            <p id="calc-daily-energy"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-pf);">0.00
+                                <span>kWh</span>
+                            </p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Monthly Comparison</h4>
+                            <p id="calc-monthly-energy"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
+                                0.00 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kWh this
+                                    month</span></p>
+                            <div id="calc-prev-monthly-energy" style="margin-top: 0.25rem;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End tab-analytics -->
+
+            <div id="tab-power-quality" class="tab-content" style="display: none;">
+                <div class="glass" style="padding: 2rem; margin-top: 1rem;">
+                    <div class="panel-header"
+                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-wave-square" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">Power Quality Metrics</h2>
+                    </div>
+                    <div class="analytics-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Voltage Status</h4>
+                            <p id="pq-voltage-status"
+                                style="font-size: 1.25rem; font-weight: 700; color: var(--accent-energy);">Normal</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Frequency Status</h4>
+                            <p id="pq-frequency-status"
+                                style="font-size: 1.25rem; font-weight: 700; color: var(--accent-energy);">Normal</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Power Factor Status</h4>
+                            <p id="pq-pf-status"
+                                style="font-size: 1.25rem; font-weight: 700; color: var(--accent-energy);">Normal</p>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End tab-power-quality -->
+
+            <div id="tab-tariff-billing" class="tab-content" style="display: none;">
+                <div class="glass" style="padding: 2rem; margin-top: 1rem;">
+                    <div class="panel-header"
+                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-file-invoice-dollar"
+                            style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">Tariff & Billing Management</h2>
+                    </div>
+                    <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Total Energy Consumed</h4>
+                            <p id="tb-total-energy"
+                                style="font-size: 2rem; font-weight: 700; color: var(--accent-energy);">0.00 <span
+                                    style="font-size: 1.25rem;">kWh</span></p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4
+                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
+                                Estimated Bill (₹6/kWh)</h4>
+                            <p id="tb-est-bill" style="font-size: 2rem; font-weight: 700; color: var(--primary);">₹ 0.00
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- End tab-tariff-billing -->
+
+            <div id="tab-consumers" class="tab-content" style="display: none;">
+                <section class="glass" style="padding: 1.5rem; margin-top: 1rem;">
+                    <div class="panel-header"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <i class="fa-solid fa-users" style="color: var(--primary); font-size: 1.5rem;"></i>
+                            <h2 style="font-size: 1.25rem; font-weight: 600;">Consumer Management</h2>
+                        </div>
+                        <div style="display: flex; gap: 1rem;">
+                            <input type="text" id="consumer-search" placeholder="Search consumers..."
+                                style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: #F3F4F6; color: var(--primary);">
+                            <select id="consumer-filter"
+                                style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--glass-border); background: var(--bg-color); color: var(--primary);">
+                                <option value="all">All Categories</option>
+                                <option value="household">Household</option>
+                                <option value="msme">MSME</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container" style="width: 100%; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        ID</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        Name</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        Category</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        Balance</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        Credit Score</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem;">
+                                        Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="consumers-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <div id="tab-consumer-profile" class="tab-content" style="display: none;">
+                <button id="btn-back-consumers"
+                    style="margin-bottom: 1rem; background: none; border: none; color: var(--primary); font-size: 1rem; cursor: pointer;"><i
+                        class="fa-solid fa-arrow-left"></i> Back to Consumers</button>
+                <div class="glass" style="padding: 2rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+                        <div>
+                            <h2 id="cp-name" style="font-size: 1.8rem; font-weight: 700;">Consumer Name</h2>
+                            <p id="cp-info" style="color: var(--text-muted);">ID: - | Meter: -</p>
+                            <span id="cp-category"
+                                style="display: inline-block; margin-top: 0.5rem; padding: 0.25rem 0.75rem; background: rgba(59,130,246,0.2); color: var(--primary); border-radius: 99px; font-size: 0.85rem; font-weight: 600;">Category</span>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="color: var(--text-muted); font-size: 0.9rem;">Prepaid Balance</p>
+                            <h3 id="cp-balance" style="font-size: 2.2rem; color: var(--accent-energy);">₹ 0.00</h3>
+                        </div>
+                    </div>
+
+                    <div class="analytics-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Credit Score</h4>
+                            <p id="cp-credit-score"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-voltage);">100</p>
+                            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Reward tier
+                                visible below</p>
+                        </div>
+                        <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Current Load</h4>
+                            <p id="cp-load" style="font-size: 1.5rem; font-weight: 700;">0 kW</p>
+                        </div>
+                        <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Power Factor History</h4>
+                            <p id="cp-pf-history" style="font-size: 1.5rem; font-weight: 700;">0.00</p>
+                        </div>
+                        <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Total Penalties</h4>
+                            <p id="cp-penalties"
+                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-power);">₹ 0.00</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3>Summary Statistics</h3>
+                            <div
+                                style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1.5rem;">
+                                <div>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">Total Energy This Month</p>
+                                    <p id="cp-stat-energy"
+                                        style="font-size: 1.25rem; font-weight: 600; color: var(--accent-energy);">0 kWh
+                                    </p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">Avg Daily Consumption</p>
+                                    <p id="cp-stat-daily"
+                                        style="font-size: 1.25rem; font-weight: 600; color: var(--primary);">0 kWh</p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">Peak Demand</p>
+                                    <p id="cp-stat-peak"
+                                        style="font-size: 1.25rem; font-weight: 600; color: var(--accent-power);">0 kW
+                                    </p>
+                                </div>
+                                <div>
+                                    <p style="color: var(--text-muted); font-size: 0.85rem;">Average Power Factor</p>
+                                    <p id="cp-stat-pf"
+                                        style="font-size: 1.25rem; font-weight: 600; color: var(--accent-pf);">0.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3>Recharge History</h3>
+                            <div style="margin-top: 1rem; max-height: 200px; overflow-y: auto;">
+                                <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; color: var(--text-muted);">
+                                                Date</th>
+                                            <th
+                                                style="border-bottom: 1px solid var(--glass-border); padding-bottom: 0.5rem; color: var(--text-muted);">
+                                                Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cp-recharge-history"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="glass" style="padding: 1.5rem;">
+                            <h3>Credit Score Rewards Tier</h3>
+                            <ul
+                                style="margin-top: 1rem; color: var(--text-muted); padding-left: 1.5rem; line-height: 1.8;">
+                                <li><strong>&gt; 150 points:</strong> Premium (Cashback on recharge)</li>
+                                <li><strong>100 - 150 points:</strong> Standard (Normal tariff)</li>
+                                <li><strong>&lt; 100 points:</strong> Warning (Additional deposits required)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-supplier-analytics" class="tab-content" style="display: none;">
+                <div class="glass" style="padding: 2rem; margin-top: 1rem;">
+                    <div class="panel-header"
+                        style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <i class="fa-solid fa-chart-bar" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">Supplier Analytics Overview</h2>
+                    </div>
+                    <div class="analytics-grid"
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total
+                                Consumers</h4>
+                            <p id="sa-total-consumers" style="font-size: 1.8rem; font-weight: 700;">0</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">In Grace
+                                Period</h4>
+                            <p id="sa-grace-period"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--accent-voltage);">0</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Overdue
+                                Consumers</h4>
+                            <p id="sa-overdue-consumers"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--accent-power);">0</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total
+                                Prepaid Balance</h4>
+                            <p id="sa-total-revenue"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--primary);">₹ 0</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total
+                                Energy Supplied Today</h4>
+                            <p id="sa-total-energy"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--accent-energy);">0 <span
+                                    style="font-size: 1rem;">kWh</span></p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total
+                                Penalties Issued</h4>
+                            <p id="sa-penalties"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--accent-power);">₹ 0</p>
+                        </div>
+                        <div class="analytics-item"
+                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center;">
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+                                Compensations Issued</h4>
+                            <p id="sa-compensations"
+                                style="font-size: 1.8rem; font-weight: 700; color: var(--accent-current);">₹ 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-event-log" class="tab-content" style="display: none;">
+                <section class="event-log-section glass" style="padding: 1.5rem;">
+                    <div class="panel-header"
+                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-clipboard-list" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">System Event Log</h2>
+                    </div>
+                    <div class="table-container" style="width: 100%; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                            <thead>
+                                <tr>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase;">
+                                        Time</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase;">
+                                        Consumer ID</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase;">
+                                        Event Type</th>
+                                    <th
+                                        style="padding: 1rem; border-bottom: 1px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.9rem; text-transform: uppercase;">
+                                        Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="event-log-body">
+                                <!-- Events will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div> <!-- End tab-event-log -->
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+
+</html>
