@@ -12,19 +12,23 @@
             "status": "active"
         }
     },
-    "meters": {
-        "meter_101": {
-            "readings": {
-                "17100001": {
-                    "voltage": 231,
-                    "current": 3.5,
-                    "frequency": 49.9,
-                    "power": 805,
-                    "power_factor": 0.96,
-                    "energy_increment": 0.002,
-                    "outage_flag": 0
-                }
-            }
+    "meter": {
+        "voltage": 231,
+        "current": 3.5,
+        "frequency": 49.9,
+        "activePower": 805,
+        "pf": 0.96,
+        "energy": 124.5
+    },
+    "readings": {
+        "<push_id>": {
+            "voltage": 231,
+            "current": 3.5,
+            "frequency": 49.9,
+            "power": 805,
+            "power_factor": 0.96,
+            "energy": 124.5,
+            "timestamp": 1710000100
         }
     },
     "tariff_rules": {

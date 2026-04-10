@@ -31,6 +31,10 @@
                 <a href="#" data-target="tab-supplier-analytics"><i class="fa-solid fa-chart-bar"></i> Supplier
                     Analytics</a>
                 <a href="#" data-target="tab-event-log"><i class="fa-solid fa-clipboard-list"></i> Event Log</a>
+                <a href="#" data-target="tab-tariff-settings"><i class="fa-solid fa-cogs"></i> Tariff Config</a>
+                <a href="#" data-target="tab-meter-health"><i class="fa-solid fa-heart-pulse"></i> Meter Health</a>
+                <a href="#" data-target="tab-load-shedding"><i class="fa-solid fa-toggle-off"></i> Load Shedding</a>
+                <a href="#" data-target="tab-complaints"><i class="fa-solid fa-ticket"></i> Complaints</a>
             </nav>
         </aside>
 
@@ -104,6 +108,14 @@
                             <p id="live-energy">124.5 <span>kWh</span></p>
                         </div>
                     </div>
+                    <div class="card glass">
+                        <div class="card-icon pf"><i class="fa-solid fa-tag"></i></div>
+                        <div class="card-data">
+                            <h3>Reading Category</h3>
+                            <p id="live-reading-category"
+                                style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">—</p>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="placeholders">
@@ -127,87 +139,177 @@
                             </div>
                         </div>
                     </div>
+                </section>
             </div> <!-- End tab-live-monitor -->
 
             <div id="tab-analytics" class="tab-content" style="display: none;">
-                <div class="analytics-panel glass">
-                    <div class="panel-header"
-                        style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <!-- Energy Analytics Header -->
+                <div class="analytics-panel glass" style="margin-bottom: 1.5rem;">
+                    <div class="panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
                         <i class="fa-solid fa-chart-pie" style="color: var(--primary); font-size: 1.5rem;"></i>
                         <h2 style="font-size: 1.25rem; font-weight: 600;">Energy Analytics</h2>
+                        <span id="analytics-last-updated" style="margin-left: auto; font-size: 0.8rem; color: var(--text-muted);">Waiting for data…</span>
                     </div>
-                    <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Peak Load</h4>
-                            <p id="calc-peak-load"
-                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-power);">0
-                                <span>W</span>
-                            </p>
+
+                    <!-- Sub-tab Navigation -->
+                    <div id="analytics-subtabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; border-bottom: 2px solid var(--glass-border); padding-bottom: 0.75rem;">
+                        <button class="analytics-subtab-btn active" data-subtab="subtab-peak" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--primary); background: var(--primary); color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-arrow-trend-up"></i> Peak Load
+                        </button>
+                        <button class="analytics-subtab-btn" data-subtab="subtab-avg" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--glass-border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-gauge-high"></i> Avg Load
+                        </button>
+                        <button class="analytics-subtab-btn" data-subtab="subtab-min" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--glass-border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-arrow-trend-down"></i> Min Load
+                        </button>
+                        <button class="analytics-subtab-btn" data-subtab="subtab-lf" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--glass-border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-percent"></i> Load Factor
+                        </button>
+                        <button class="analytics-subtab-btn" data-subtab="subtab-energy" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--glass-border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-bolt"></i> Energy
+                        </button>
+                        <button class="analytics-subtab-btn" data-subtab="subtab-houses" style="padding: 0.45rem 1.1rem; border-radius: 99px; border: 1.5px solid var(--glass-border); background: transparent; color: var(--text-main); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s;">
+                            <i class="fa-solid fa-house-signal"></i> Per-House
+                        </button>
+                    </div>
+
+                    <!-- SUB-TAB: Peak Load -->
+                    <div id="subtab-peak" class="analytics-subtab-content" style="display: block;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="analytics-item" style="background: linear-gradient(135deg,#FFF1F2,#FFE4E6); border: 1.5px solid #FECDD3; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: #9F1239; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;">System Peak Load</h4>
+                                <p id="calc-peak-load" style="font-size: 2rem; font-weight: 800; color: var(--accent-power);">— <span style="font-size:1rem;">W</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Highest instantaneous demand across all 6 houses</p>
+                            </div>
+                            <div class="analytics-item" style="background: linear-gradient(135deg,#FFF7ED,#FED7AA33); border: 1.5px solid #FED7AA; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: #92400E; text-transform: uppercase; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Peak House</h4>
+                                <p id="analytics-peak-house" style="font-size: 1.6rem; font-weight: 800; color: #D97706;">—</p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">House with highest current power demand</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Total Active Houses</h4>
+                                <p id="analytics-active-houses" style="font-size: 2rem; font-weight: 800; color: var(--primary);">0 <span style="font-size:1rem; color: var(--text-muted);">/ 6</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Houses with live readings in last 30s</p>
+                            </div>
                         </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Average Load</h4>
-                            <p id="calc-avg-load"
-                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-voltage);">0
-                                <span>W</span>
-                            </p>
-                        </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Total Energy</h4>
-                            <p id="calc-total-energy"
-                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-energy);">0.00
-                                <span>kWh</span>
-                            </p>
-                        </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Est. Cost (₹6/kWh)</h4>
-                            <p id="calc-est-cost" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₹
-                                0.00</p>
-                        </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Hourly Energy</h4>
-                            <p id="calc-hourly-energy"
-                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-freq);">0.00
-                                <span>kWh</span>
-                            </p>
-                        </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Daily Energy</h4>
-                            <p id="calc-daily-energy"
-                                style="font-size: 1.5rem; font-weight: 700; color: var(--accent-pf);">0.00
-                                <span>kWh</span>
-                            </p>
-                        </div>
-                        <div class="analytics-item"
-                            style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 12px; padding: 1.25rem; text-align: center; transition: transform 0.3s; grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                            <h4
-                                style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">
-                                Monthly Comparison</h4>
-                            <p id="calc-monthly-energy"
-                                style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">
-                                0.00 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kWh this
-                                    month</span></p>
-                            <div id="calc-prev-monthly-energy" style="margin-top: 0.25rem;"></div>
+                        <div class="chart-card glass" style="margin-top: 1.25rem;">
+                            <h3 style="margin-bottom: 0.75rem;">Live Power per House <span style="font-size:0.8rem; color:var(--text-muted); font-weight:400;">(real-time, updates every second)</span></h3>
+                            <canvas id="housePowerBarChart" style="max-height:260px;"></canvas>
                         </div>
                     </div>
+
+                    <!-- SUB-TAB: Avg Load -->
+                    <div id="subtab-avg" class="analytics-subtab-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="analytics-item" style="background: linear-gradient(135deg,#EFF6FF,#DBEAFE); border: 1.5px solid #BFDBFE; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: #1E40AF; text-transform: uppercase; margin-bottom: 0.5rem;">System Avg Load</h4>
+                                <p id="calc-avg-load" style="font-size: 2rem; font-weight: 800; color: var(--accent-voltage);">— <span style="font-size:1rem;">W</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Mean of all active house readings</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Avg per Active House</h4>
+                                <p id="analytics-avg-per-house" style="font-size: 2rem; font-weight: 800; color: var(--primary);">— <span style="font-size:1rem;">W</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Total load ÷ active houses</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Avg Power Factor</h4>
+                                <p id="analytics-avg-pf" style="font-size: 2rem; font-weight: 800; color: var(--accent-pf);">—</p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Across all 6 houses</p>
+                            </div>
+                        </div>
+                        <div id="analytics-avg-table" style="margin-top:1.25rem; overflow-x:auto;">
+                            <table style="width:100%; border-collapse:collapse; text-align:left; font-size:0.9rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding:0.75rem 1rem; border-bottom:2px solid var(--glass-border); color:var(--text-muted); font-weight:500;">House</th>
+                                        <th style="padding:0.75rem 1rem; border-bottom:2px solid var(--glass-border); color:var(--text-muted); font-weight:500;">Current Power</th>
+                                        <th style="padding:0.75rem 1rem; border-bottom:2px solid var(--glass-border); color:var(--text-muted); font-weight:500;">Avg (session)</th>
+                                        <th style="padding:0.75rem 1rem; border-bottom:2px solid var(--glass-border); color:var(--text-muted); font-weight:500;">Power Factor</th>
+                                        <th style="padding:0.75rem 1rem; border-bottom:2px solid var(--glass-border); color:var(--text-muted); font-weight:500;">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="analytics-avg-table-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB: Min Load -->
+                    <div id="subtab-min" class="analytics-subtab-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                            <div class="analytics-item" style="background: linear-gradient(135deg,#F0FDF4,#DCFCE7); border: 1.5px solid #86EFAC; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: #14532D; text-transform: uppercase; margin-bottom: 0.5rem;">System Min Load</h4>
+                                <p id="analytics-min-load" style="font-size: 2rem; font-weight: 800; color: var(--accent-energy);">— <span style="font-size:1rem;">W</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Lowest demand across all active houses</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Lowest Demand House</h4>
+                                <p id="analytics-min-house" style="font-size: 1.6rem; font-weight: 800; color: var(--accent-energy);">—</p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">House with minimum power draw right now</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Offline Houses</h4>
+                                <p id="analytics-offline-count" style="font-size: 2rem; font-weight: 800; color: #6B7280;">0</p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">No readings in the last 30s</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB: Load Factor -->
+                    <div id="subtab-lf" class="analytics-subtab-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+                            <div class="analytics-item" style="background: linear-gradient(135deg,#F5F3FF,#EDE9FE); border: 1.5px solid #C4B5FD; border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: #4C1D95; text-transform: uppercase; margin-bottom: 0.5rem;">System Load Factor</h4>
+                                <p id="analytics-load-factor" style="font-size: 2rem; font-weight: 800; color: #7C3AED;">— <span style="font-size:1rem;">%</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Avg Load ÷ Peak Load × 100</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Demand Diversity Factor</h4>
+                                <p id="analytics-diversity-factor" style="font-size: 2rem; font-weight: 800; color: var(--primary);">—</p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Sum of individual peaks ÷ coincident peak</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Grid Utilization</h4>
+                                <p id="analytics-grid-util" style="font-size: 2rem; font-weight: 800; color: var(--accent-freq);">— <span style="font-size:1rem;">%</span></p>
+                                <p style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.4rem;">Current load vs total connected load capacity</p>
+                            </div>
+                        </div>
+                        <div id="analytics-lf-bars" style="margin-top:1.25rem; display:grid; gap:0.75rem;"></div>
+                    </div>
+
+                    <!-- SUB-TAB: Energy -->
+                    <div id="subtab-energy" class="analytics-subtab-content" style="display: none;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Total Energy (All Houses)</h4>
+                                <p id="calc-total-energy" style="font-size: 2rem; font-weight: 800; color: var(--accent-energy);">0.00 <span style="font-size:1rem;">kWh</span></p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Est. Cost (₹6/kWh)</h4>
+                                <p id="calc-est-cost" style="font-size: 2rem; font-weight: 800; color: var(--primary);">₹ 0.00</p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Hourly Energy</h4>
+                                <p id="calc-hourly-energy" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-freq);">0.00 <span>kWh</span></p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Daily Energy</h4>
+                                <p id="calc-daily-energy" style="font-size: 1.5rem; font-weight: 700; color: var(--accent-pf);">0.00 <span>kWh</span></p>
+                            </div>
+                            <div class="analytics-item" style="background: #F9FAFB; border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.5rem; text-align: center; grid-column: 1 / -1;">
+                                <h4 style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.5rem;">Monthly Comparison</h4>
+                                <p id="calc-monthly-energy" style="font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 0.25rem;">0.00 <span style="font-size: 1rem; color: var(--text-muted); font-weight: 500;">kWh this month</span></p>
+                                <div id="calc-prev-monthly-energy" style="margin-top: 0.25rem;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SUB-TAB: Per-House Breakdown -->
+                    <div id="subtab-houses" class="analytics-subtab-content" style="display: none;">
+                        <div id="analytics-per-house-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;"></div>
+                    </div>
+
                 </div>
+            </div>
             </div> <!-- End tab-analytics -->
 
             <div id="tab-power-quality" class="tab-content" style="display: none;">
@@ -276,6 +378,60 @@
                     </div>
                 </div>
             </div> <!-- End tab-tariff-billing -->
+
+            <div id="tab-tariff-settings" class="tab-content" style="display: none;">
+                <div class="glass" style="padding: 2rem; margin-top: 1rem;">
+                    <div class="panel-header" style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                        <i class="fa-solid fa-cogs" style="color: var(--primary); font-size: 1.5rem;"></i>
+                        <h2 style="font-size: 1.25rem; font-weight: 600;">Global Tariff Rules & Charging</h2>
+                    </div>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem;">Changes made here will instantly affect the real-time billing deduction engine universally for all consumer meters.</p>
+                    
+                    <div class="analytics-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <div class="glass" style="padding: 1.5rem; background: #F9FAFB; border: 1px solid var(--glass-border);">
+                            <h3 style="margin-bottom: 1rem; color: var(--primary);">Household Tariffs (₹ / kWh)</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 500; font-size: 0.9rem;">0 - 100 Units</span>
+                                    <input type="number" id="input-rate-slab1" value="4" style="width: 80px; padding: 0.5rem; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 500; font-size: 0.9rem;">101 - 300 Units</span>
+                                    <input type="number" id="input-rate-slab2" value="6" style="width: 80px; padding: 0.5rem; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 500; font-size: 0.9rem;">> 300 Units</span>
+                                    <input type="number" id="input-rate-slab3" value="8" style="width: 80px; padding: 0.5rem; border-radius: 6px; border: 1px solid #ccc; text-align: center;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="glass" style="padding: 1.5rem; background: #FFF1F2; border: 1px solid #FECDD3;">
+                            <h3 style="margin-bottom: 1rem; color: var(--accent-power);">Power Factor Penalty Rule</h3>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-main);">Penalty Level 1 (&lt; 0.90 PF)</span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="number" id="input-pf-pen1" value="2" style="width: 80px; padding: 0.5rem; border-radius: 6px; border: 1px solid #FECDD3; text-align: center;">
+                                        <span>% extra charge</span>
+                                    </div>
+                                </label>
+                                <label style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-weight: 500; font-size: 0.9rem; color: var(--text-main);">Penalty Level 2 (&lt; 0.85 PF)</span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <input type="number" id="input-pf-pen2" value="5" style="width: 80px; padding: 0.5rem; border-radius: 6px; border: 1px solid #FECDD3; text-align: center;">
+                                        <span>% extra charge</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 2rem; text-align: right;">
+                        <button id="save-tariff-btn" style="background: var(--primary); color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 1rem;"><i class="fa-solid fa-floppy-disk" style="margin-right: 0.5rem;"></i> Apply New Tariffs Universal</button>
+                    </div>
+                </div>
+            </div>
 
             <div id="tab-consumers" class="tab-content" style="display: none;">
                 <section class="glass" style="padding: 1.5rem; margin-top: 1rem;">
@@ -361,7 +517,7 @@
                             <p id="cp-load" style="font-size: 1.5rem; font-weight: 700;">0 kW</p>
                         </div>
                         <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
-                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Power Factor History</h4>
+                            <h4 style="font-size: 0.85rem; color: var(--text-muted);">Real-Time Power Factor</h4>
                             <p id="cp-pf-history" style="font-size: 1.5rem; font-weight: 700;">0.00</p>
                         </div>
                         <div class="analytics-item glass" style="padding: 1.25rem; text-align: center;">
@@ -429,6 +585,37 @@
                                 <li><strong>100 - 150 points:</strong> Standard (Normal tariff)</li>
                                 <li><strong>&lt; 100 points:</strong> Warning (Additional deposits required)</li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <!-- Recent Meter Readings from /readings -->
+                    <div class="glass" style="padding: 1.5rem; margin-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <i class="fa-solid fa-chart-line" style="color: var(--primary); font-size: 1.25rem;"></i>
+                                <h3 style="font-weight: 600;">Recent Meter Readings</h3>
+                            </div>
+                            <span class="badge" style="background: #ECFDF5; color: var(--accent-energy); border: 1px solid var(--accent-energy); padding: 0.25rem 0.75rem; font-size: 0.8rem;">HOUSEHOLD</span>
+                        </div>
+                        <div style="width: 100%; overflow-x: auto; max-height: 350px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                                <thead>
+                                    <tr>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Time</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Voltage</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Current</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Power</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">PF</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Frequency</th>
+                                        <th style="padding: 0.75rem; border-bottom: 2px solid var(--glass-border); color: var(--text-muted); font-weight: 500; font-size: 0.8rem; text-transform: uppercase; position: sticky; top: 0; background: var(--card-bg);">Energy</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cp-readings-body">
+                                    <tr>
+                                        <td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-muted);">Loading readings...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -528,7 +715,85 @@
                     </div>
                 </section>
             </div> <!-- End tab-event-log -->
-        </main>
+
+            <!-- METER HEALTH TAB -->
+            <div id="tab-meter-health" class="tab-content" style="display:none;">
+                <section class="glass" style="padding:1.5rem; margin-top:1rem;">
+                    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
+                        <i class="fa-solid fa-heart-pulse" style="color:var(--accent-energy); font-size:1.5rem;"></i>
+                        <h2 style="font-size:1.25rem; font-weight:600;">Meter Health Monitor</h2>
+                    </div>
+                    <div id="meter-health-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:1rem;">
+                        <p style="color:var(--text-muted);">Loading meter statuses...</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- LOAD SHEDDING TAB -->
+            <div id="tab-load-shedding" class="tab-content" style="display:none;">
+                <section class="glass" style="padding:1.5rem; margin-top:1rem;">
+                    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
+                        <i class="fa-solid fa-toggle-off" style="color:var(--accent-power); font-size:1.5rem;"></i>
+                        <h2 style="font-size:1.25rem; font-weight:600;">Remote Disconnect & Load Shedding</h2>
+                    </div>
+                    <p style="color:var(--text-muted); font-size:0.9rem; margin-bottom:1.5rem;">Toggle individual meters or schedule outages by category. The <code>command</code> flag is pushed to Firebase. Your physical meter firmware must poll <code>/consumers/{id}/command</code> and trip the relay accordingly.</p>
+                    <div id="load-shedding-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:1rem;"></div>
+                    <div class="glass" style="margin-top:2rem; padding:1.5rem; background:#FFF7ED; border:1px solid #FED7AA;">
+                        <h3 style="margin-bottom:1rem; color:var(--accent-power);"><i class="fa-solid fa-calendar-xmark"></i> Schedule Group Outage</h3>
+                        <div style="display:flex; gap:1rem; flex-wrap:wrap; align-items:flex-end;">
+                            <label style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.9rem; font-weight:500;">
+                                Category
+                                <select id="shed-category" style="padding:0.5rem; border-radius:6px; border:1px solid #ccc;">
+                                    <option value="all">All Consumers</option>
+                                    <option value="household">Household Only</option>
+                                    <option value="msme">MSME Only</option>
+                                </select>
+                            </label>
+                            <label style="display:flex; flex-direction:column; gap:0.4rem; font-size:0.9rem; font-weight:500;">
+                                Duration (minutes)
+                                <input type="number" id="shed-duration" value="30" min="1" style="padding:0.5rem; border-radius:6px; border:1px solid #ccc; width:120px;">
+                            </label>
+                            <button id="btn-schedule-shed" style="padding:0.6rem 1.5rem; background:var(--accent-power); color:#fff; border:none; border-radius:8px; font-weight:600; cursor:pointer;"><i class="fa-solid fa-power-off"></i> Execute</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- COMPLAINTS TAB -->
+            <div id="tab-complaints" class="tab-content" style="display:none;">
+                <section class="glass" style="padding:1.5rem; margin-top:1rem;">
+                    <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1.5rem;">
+                        <i class="fa-solid fa-ticket" style="color:var(--primary); font-size:1.5rem;"></i>
+                        <h2 style="font-size:1.25rem; font-weight:600;">Consumer Complaints & Support Tickets</h2>
+                    </div>
+                    <div style="display:flex; gap:1rem; justify-content:flex-end; margin-bottom:1.5rem;">
+                        <select id="complaint-filter-status" style="padding:0.5rem; border-radius:6px; border:1px solid #ccc;">
+                            <option value="all">All Status</option>
+                            <option value="open">Open</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                    <div class="table-container" style="width:100%; overflow-x:auto;">
+                        <table style="width:100%; border-collapse:collapse; text-align:left;">
+                            <thead>
+                                <tr>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Ticket ID</th>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Consumer</th>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Issue</th>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Time</th>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Status</th>
+                                    <th style="padding:1rem; border-bottom:1px solid var(--glass-border); color:var(--text-muted); font-size:0.85rem; text-transform:uppercase;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="complaints-body">
+                                <tr><td colspan="6" style="padding:2rem; text-align:center; color:var(--text-muted);">Loading tickets...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
